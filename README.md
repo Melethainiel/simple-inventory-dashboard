@@ -37,3 +37,14 @@ Copy `custom_components/simple_inventory_dashboard` into Home Assistant's
 
 - Home Assistant 2024.7 or newer
 - Simple Inventory 0.6.x
+
+## Releases
+
+The CI validates the Python, JSON and frontend sources on pull requests and on
+pushes to `main`. It also builds a HACS-ready `simple_inventory_dashboard.zip`.
+
+On `main`, the version in
+`custom_components/simple_inventory_dashboard/manifest.json` is published as a
+Git tag and GitHub Release (for example, version `0.2.0` creates tag `v0.2.0`).
+Increment the manifest version and the matching `?v=` value in `__init__.py`
+before merging a new release. An existing version is never overwritten.

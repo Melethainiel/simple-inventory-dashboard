@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  COMPONENT: simple_inventory_dashboard
+  RELEASE_ARCHIVE: simple_inventory_dashboard.zip
+
+jobs:
+  build:
+    name: Validate and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate Python and JSON files
+        shell: bash
+        run: |
+          python -m compileall -q "custom_components/${COMPONENT}"
+          python -m json.tool hacs.json >/dev/null
+          python -m json.tool "custom_components/${COMPONENT}/manifest.json" >/dev/null
+          python -m json.tool "custom_components/${COMPONENT}/strings.json" >/dev/null
+          python -m json.tool "custom_components/${COMPONENT}/translations/fr.json" >/dev/null
+
+      - name: Validate version consistency
+        shell: bash
+        run: |
+          version="$(jq -r '.version' "custom_components/${COMPONENT}/manifest.json")"
+          test -n "${version}"
+          test "${version}" != "null"
+          grep -Fq "?v=${version}" "custom_components/${COMPONENT}/__init__.py"
+
+      - name: Compile frontend and package integration
+        shell: bash
+        run: |
+          mkdir -p build/release
+          cp -R "custom_components/${COMPONENT}/." build/release/
+          rm -rf build/release/__pycache__
+          npx --yes esbuild@0.25.9 \
+            "custom_components/${COMPONENT}/www/dashboard.js" \
+            --bundle \
+            --minify \
+            --target=es2022 \
+            --outfile=build/release/www/dashboard.js
+          cd build/release
+          zip -qr "../../${RELEASE_ARCHIVE}" .
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: simple-inventory-dashboard
+          path: ${{ env.RELEASE_ARCHIVE }}
+          if-no-files-found: error
+
+  release:
+    name: Publish tag and release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: simple-inventory-dashboard
+
+      - name: Read release version
+        id: version
+        shell: bash
+        run: |
+          version="$(jq -r '.version' "custom_components/${COMPONENT}/manifest.json")"
+          echo "tag=v${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the version is already published
+        id: published
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
+             gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "${TAG} already exists; nothing to do."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Git tag and GitHub Release
+        if: steps.published.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          gh release create "${TAG}" "${RELEASE_ARCHIVE}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "${TAG}" \
+            --generate-notes

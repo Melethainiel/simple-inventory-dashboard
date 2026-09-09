@@ -1,5 +1,7 @@
 {
+  "filename": "simple_inventory_dashboard.zip",
+  "homeassistant": "2024.7.0",
   "name": "Simple Inventory Dashboard",
   "render_readme": true,
-  "homeassistant": "2024.7.0"
+  "zip_release": true
 }
