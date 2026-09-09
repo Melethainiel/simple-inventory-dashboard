@@ -81,3 +81,73 @@ take_item:
       default: 1
       selector:
         number: { min: 0.001, max: 999, step: any, mode: box }
+
+edit_item:
+  name: Edit an item
+  description: Edit any supported field of one item. Nothing changes when the item is missing or ambiguous.
+  fields:
+    name:
+      name: Current item name
+      description: Full or partial current name.
+      required: true
+      selector: { text: {} }
+    inventory:
+      name: Inventory
+      description: Optional exact inventory name or ID, used to resolve ambiguity.
+      selector: { text: {} }
+    new_name:
+      name: New name
+      selector: { text: {} }
+    quantity:
+      name: Total quantity
+      selector:
+        number: { min: 0, max: 999, step: any, mode: box }
+    unit:
+      name: Unit
+      selector: { text: {} }
+    location:
+      name: Location
+      selector: { text: {} }
+    category:
+      name: Category
+      selector: { text: {} }
+    description:
+      name: Description
+      selector: { text: { multiline: true } }
+    barcode:
+      name: Barcode
+      selector: { text: {} }
+    price:
+      name: Unit price
+      selector:
+        number: { min: 0, step: 0.01, mode: box }
+    expiry_date:
+      name: Expiry date
+      description: Date in YYYY-MM-DD format. Pass an empty value to remove it.
+      selector: { text: {} }
+    expiry_alert_days:
+      name: Expiry alert days
+      selector:
+        number: { min: 0, step: 1, mode: box }
+    auto_add_enabled:
+      name: Automatic shopping-list addition
+      selector: { boolean: {} }
+    auto_add_to_list_quantity:
+      name: Low-stock threshold
+      selector:
+        number: { min: 0, step: any, mode: box }
+    desired_quantity:
+      name: Desired quantity
+      selector:
+        number: { min: 0, step: any, mode: box }
+    todo_list:
+      name: Todo list
+      selector:
+        entity: { domain: todo }
+    todo_quantity_placement:
+      name: Quantity placement
+      selector:
+        select:
+          options:
+            - name
+            - description

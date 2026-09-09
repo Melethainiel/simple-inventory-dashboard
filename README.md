@@ -20,7 +20,7 @@ services. Data stays in Simple Inventory; this integration only provides the UI.
 
 ## Voice assistant integration
 
-On Home Assistant 2026.8 or newer, the integration contributes five native tools
+On Home Assistant 2026.8 or newer, the integration contributes six native tools
 directly to the **Assist** LLM API. No YAML scripts or manual entity exposure are
 required. Select **Assist** as the control mode in the conversation agent; it can
 then discover and call these tools automatically:
@@ -34,6 +34,8 @@ then discover and call these tools automatically:
   existing item with the same name
 - `simple_inventory_dashboard.take_item`: finds and decrements an item; if a
   partial name matches several items, it returns the matches without changing stock
+- `simple_inventory_dashboard.edit_item`: edits the name, total quantity, unit,
+  location, category, description, barcode, price, expiry and shopping-list settings
 
 The same operations remain available as response-enabled services for dashboards
 and automations. They discover inventories dynamically, so inventory IDs do not

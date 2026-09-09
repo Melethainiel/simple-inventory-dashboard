@@ -13,6 +13,7 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import (
     DOMAIN,
+    SERVICE_EDIT_ITEM,
     SERVICE_LIST_INVENTORIES,
     SERVICE_LIST_LOCATION,
     SERVICE_SEARCH_ITEMS,
@@ -199,6 +200,66 @@ async def _take(call: ServiceCall) -> dict[str, Any]:
             "location": item.get("locations", item.get("location"))}
 
 
+EDITABLE_FIELDS = (
+    "quantity",
+    "unit",
+    "location",
+    "category",
+    "description",
+    "barcode",
+    "price",
+    "expiry_date",
+    "expiry_alert_days",
+    "auto_add_enabled",
+    "auto_add_to_list_quantity",
+    "desired_quantity",
+    "todo_list",
+    "todo_quantity_placement",
+)
+
+
+async def _edit(call: ServiceCall) -> dict[str, Any]:
+    """Resolve one item and update every explicitly supplied field."""
+    candidates = _find(
+        await _all_items(call.hass), call.data["name"], call.data.get("inventory")
+    )
+    exact = [
+        item for item in candidates
+        if _normalise(item.get("name")) == _normalise(call.data["name"])
+    ]
+    if exact:
+        candidates = exact
+    if not candidates:
+        return {"success": False, "reason": "not_found", "matches": []}
+    if len(candidates) > 1:
+        return {"success": False, "reason": "ambiguous", "matches": candidates}
+
+    changes = {field: call.data[field] for field in EDITABLE_FIELDS if field in call.data}
+    if "new_name" in call.data:
+        changes["name"] = call.data["new_name"].strip()
+    if not changes:
+        raise ServiceValidationError("Indiquez au moins un champ à modifier.")
+
+    item = candidates[0]
+    data = {
+        "inventory_id": item["inventory_id"],
+        "old_name": item["name"],
+        "name": changes.get("name", item["name"]),
+        **{key: value for key, value in changes.items() if key != "name"},
+    }
+    await call.hass.services.async_call(
+        UPSTREAM_DOMAIN, "update_item", data, blocking=True
+    )
+    return {
+        "success": True,
+        "old_name": item["name"],
+        "name": data["name"],
+        "inventory_id": item.get("inventory_id"),
+        "inventory_name": item.get("inventory_name"),
+        "changes": changes,
+    }
+
+
 TEXT = vol.All(cv.string, vol.Length(min=1))
 QUANTITY = vol.All(vol.Coerce(float), vol.Range(min=0.001, max=999))
 
@@ -214,6 +275,25 @@ def async_register_services(hass: HomeAssistant) -> None:
          vol.Optional("category"): cv.string}),
         (SERVICE_TAKE_ITEM, _take, {vol.Required("name"): TEXT, vol.Optional("inventory"): cv.string,
          vol.Optional("quantity", default=1): QUANTITY}),
+        (SERVICE_EDIT_ITEM, _edit, {
+            vol.Required("name"): TEXT,
+            vol.Optional("inventory"): cv.string,
+            vol.Optional("new_name"): TEXT,
+            vol.Optional("quantity"): vol.All(vol.Coerce(float), vol.Range(min=0, max=999)),
+            vol.Optional("unit"): cv.string,
+            vol.Optional("location"): cv.string,
+            vol.Optional("category"): cv.string,
+            vol.Optional("description"): cv.string,
+            vol.Optional("barcode"): cv.string,
+            vol.Optional("price"): vol.All(vol.Coerce(float), vol.Range(min=0)),
+            vol.Optional("expiry_date"): cv.string,
+            vol.Optional("expiry_alert_days"): vol.All(vol.Coerce(int), vol.Range(min=0)),
+            vol.Optional("auto_add_enabled"): cv.boolean,
+            vol.Optional("auto_add_to_list_quantity"): vol.All(vol.Coerce(float), vol.Range(min=0)),
+            vol.Optional("desired_quantity"): vol.All(vol.Coerce(float), vol.Range(min=0)),
+            vol.Optional("todo_list"): cv.string,
+            vol.Optional("todo_quantity_placement"): vol.In(("name", "description")),
+        }),
     )
     for name, handler, schema in definitions:
         hass.services.async_register(
@@ -230,5 +310,6 @@ def async_unregister_services(hass: HomeAssistant) -> None:
         SERVICE_LIST_LOCATION,
         SERVICE_STORE_ITEM,
         SERVICE_TAKE_ITEM,
+        SERVICE_EDIT_ITEM,
     ):
         hass.services.async_remove(DOMAIN, service)

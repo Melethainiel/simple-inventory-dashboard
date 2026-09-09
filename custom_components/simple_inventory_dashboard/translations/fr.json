@@ -15,6 +15,7 @@
     "list_inventories": { "name": "Lister les inventaires", "description": "Liste tous les inventaires configurés et leurs totaux." },
     "search_items": { "name": "Chercher un objet", "description": "Recherche un nom complet ou partiel dans les inventaires." },
     "list_location": { "name": "Lister un emplacement", "description": "Liste tous les objets rangés dans un emplacement précis." },
+    "edit_item": { "name": "Modifier un objet", "description": "Modifie tous les attributs pris en charge pour un objet sans ambiguïté." },
     "store_item": { "name": "Ranger un objet", "description": "Crée un objet ou augmente sa quantité s'il existe déjà." },
     "take_item": { "name": "Sortir un objet", "description": "Trouve un objet sans ambiguïté et diminue sa quantité." }
   }

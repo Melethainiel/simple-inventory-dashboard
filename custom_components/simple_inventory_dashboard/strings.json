@@ -15,6 +15,7 @@
     "list_inventories": { "name": "List inventories", "description": "List all configured inventories and their totals." },
     "search_items": { "name": "Search inventory items", "description": "Search by full or partial item name across inventories." },
     "list_location": { "name": "List a location", "description": "List every item stored at an exact location." },
+    "edit_item": { "name": "Edit an item", "description": "Edit all supported attributes of one unambiguous inventory item." },
     "store_item": { "name": "Store an item", "description": "Create an item or increase its existing quantity." },
     "take_item": { "name": "Take an item", "description": "Find an unambiguous item and decrease its quantity." }
   }

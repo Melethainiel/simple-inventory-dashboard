@@ -14,6 +14,7 @@ from homeassistant.util.json import JsonObjectType
 
 from .const import (
     DOMAIN,
+    SERVICE_EDIT_ITEM,
     SERVICE_LIST_INVENTORIES,
     SERVICE_LIST_LOCATION,
     SERVICE_SEARCH_ITEMS,
@@ -134,6 +135,36 @@ TOOLS: list[Tool] = [
                 vol.Optional(
                     "quantity", default=1, description="Quantity used or removed."
                 ): vol.All(vol.Coerce(float), vol.Range(min=0.001, max=999)),
+            }
+        ),
+    ),
+    InventoryTool(
+        "edit_item",
+        SERVICE_EDIT_ITEM,
+        "Edit any attributes of one existing stored object. This can rename it, "
+        "set total quantity, unit, location, category, description, barcode, price, "
+        "expiry settings and automatic shopping-list settings. Use store_item or "
+        "take_item instead for relative quantity changes. If ambiguous, ask which "
+        "inventory and retry.",
+        vol.Schema(
+            {
+                vol.Required("name", description="Current full or partial object name."): cv.string,
+                OPTIONAL_INVENTORY: cv.string,
+                vol.Optional("new_name", description="New object name."): cv.string,
+                vol.Optional("quantity", description="New total quantity."): vol.All(vol.Coerce(float), vol.Range(min=0, max=999)),
+                vol.Optional("unit", description="Unit, such as pieces, kg or L."): cv.string,
+                vol.Optional("location", description="New storage location."): cv.string,
+                vol.Optional("category", description="New category; empty removes it."): cv.string,
+                vol.Optional("description", description="New free-text description."): cv.string,
+                vol.Optional("barcode", description="New barcode; empty removes it."): cv.string,
+                vol.Optional("price", description="New unit price."): vol.All(vol.Coerce(float), vol.Range(min=0)),
+                vol.Optional("expiry_date", description="Expiry date as YYYY-MM-DD; empty removes it."): cv.string,
+                vol.Optional("expiry_alert_days", description="Days before expiry to alert."): vol.All(vol.Coerce(int), vol.Range(min=0)),
+                vol.Optional("auto_add_enabled", description="Enable automatic shopping-list addition."): cv.boolean,
+                vol.Optional("auto_add_to_list_quantity", description="Low-stock trigger threshold."): vol.All(vol.Coerce(float), vol.Range(min=0)),
+                vol.Optional("desired_quantity", description="Desired restock quantity."): vol.All(vol.Coerce(float), vol.Range(min=0)),
+                vol.Optional("todo_list", description="Home Assistant todo entity ID."): cv.string,
+                vol.Optional("todo_quantity_placement", description="Put quantity in name or description."): vol.In(("name", "description")),
             }
         ),
     ),
