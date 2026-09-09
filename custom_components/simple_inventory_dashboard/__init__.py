@@ -31,7 +31,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config={
             "_panel_custom": {
                 "name": PANEL_ELEMENT,
-                "module_url": f"{PANEL_JS_URL}?v=0.2.1",
+                "module_url": f"{PANEL_JS_URL}?v=0.2.2",
                 "embed_iframe": False,
                 "trust_external": False,
             }

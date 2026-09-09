@@ -1,3 +1,7 @@
+list_inventories:
+  name: List inventories
+  description: Return all configured inventories with their names, IDs and totals.
+
 search_items:
   name: Search inventory items
   description: Search by full or partial name across every inventory, or one named inventory.

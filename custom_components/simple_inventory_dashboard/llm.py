@@ -14,6 +14,7 @@ from homeassistant.util.json import JsonObjectType
 
 from .const import (
     DOMAIN,
+    SERVICE_LIST_INVENTORIES,
     SERVICE_LIST_LOCATION,
     SERVICE_SEARCH_ITEMS,
     SERVICE_STORE_ITEM,
@@ -63,6 +64,14 @@ OPTIONAL_INVENTORY = vol.Optional(
 )
 
 TOOLS: list[Tool] = [
+    InventoryTool(
+        "list_inventories",
+        SERVICE_LIST_INVENTORIES,
+        "List all configured inventories or storage furniture. Use whenever the "
+        "user asks which inventories, cupboards, cabinets or storage collections "
+        "exist. Report their names and useful totals.",
+        vol.Schema({}),
+    ),
     InventoryTool(
         "search_items",
         SERVICE_SEARCH_ITEMS,

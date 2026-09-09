@@ -12,6 +12,7 @@
     }
   },
   "services": {
+    "list_inventories": { "name": "Lister les inventaires", "description": "Liste tous les inventaires configurés et leurs totaux." },
     "search_items": { "name": "Chercher un objet", "description": "Recherche un nom complet ou partiel dans les inventaires." },
     "list_location": { "name": "Lister un emplacement", "description": "Liste tous les objets rangés dans un emplacement précis." },
     "store_item": { "name": "Ranger un objet", "description": "Crée un objet ou augmente sa quantité s'il existe déjà." },

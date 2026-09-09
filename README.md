@@ -20,11 +20,13 @@ services. Data stays in Simple Inventory; this integration only provides the UI.
 
 ## Voice assistant integration
 
-On Home Assistant 2026.8 or newer, the integration contributes four native tools
+On Home Assistant 2026.8 or newer, the integration contributes five native tools
 directly to the **Assist** LLM API. No YAML scripts or manual entity exposure are
 required. Select **Assist** as the control mode in the conversation agent; it can
 then discover and call these tools automatically:
 
+- `simple_inventory_dashboard.list_inventories`: lists every configured inventory
+  with its ID and totals
 - `simple_inventory_dashboard.search_items`: partial, case- and accent-insensitive
   search across all inventories (or one optional inventory)
 - `simple_inventory_dashboard.list_location`: exact location/bin lookup

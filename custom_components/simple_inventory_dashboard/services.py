@@ -13,6 +13,7 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import (
     DOMAIN,
+    SERVICE_LIST_INVENTORIES,
     SERVICE_LIST_LOCATION,
     SERVICE_SEARCH_ITEMS,
     SERVICE_STORE_ITEM,
@@ -100,6 +101,28 @@ async def _search(call: ServiceCall) -> dict[str, Any]:
     return {"count": len(items), "items": items}
 
 
+async def _list_inventories(call: ServiceCall) -> dict[str, Any]:
+    """Return a compact inventory catalogue without duplicating every item."""
+    response = await _all_response(call.hass)
+    inventories = []
+    for entry in response.get("inventories", []):
+        if not isinstance(entry, dict):
+            continue
+        items = [item for item in entry.get("items", []) if isinstance(item, dict)]
+        inventories.append(
+            {
+                "inventory_id": entry.get("inventory_id"),
+                "inventory_name": entry.get("inventory_name"),
+                "description": entry.get("description", ""),
+                "item_count": len(items),
+                "total_quantity": sum(
+                    float(item.get("quantity", 0) or 0) for item in items
+                ),
+            }
+        )
+    return {"count": len(inventories), "inventories": inventories}
+
+
 async def _list_location(call: ServiceCall) -> dict[str, Any]:
     wanted = _normalise(call.data["location"])
     items = [
@@ -183,6 +206,7 @@ QUANTITY = vol.All(vol.Coerce(float), vol.Range(min=0.001, max=999))
 def async_register_services(hass: HomeAssistant) -> None:
     """Register high-level response services."""
     definitions = (
+        (SERVICE_LIST_INVENTORIES, _list_inventories, {}),
         (SERVICE_SEARCH_ITEMS, _search, {vol.Required("query"): TEXT, vol.Optional("inventory"): cv.string}),
         (SERVICE_LIST_LOCATION, _list_location, {vol.Required("location"): TEXT, vol.Optional("inventory"): cv.string}),
         (SERVICE_STORE_ITEM, _store, {vol.Required("name"): TEXT, vol.Required("inventory"): TEXT,
@@ -200,5 +224,11 @@ def async_register_services(hass: HomeAssistant) -> None:
 
 def async_unregister_services(hass: HomeAssistant) -> None:
     """Unregister high-level services."""
-    for service in (SERVICE_SEARCH_ITEMS, SERVICE_LIST_LOCATION, SERVICE_STORE_ITEM, SERVICE_TAKE_ITEM):
+    for service in (
+        SERVICE_LIST_INVENTORIES,
+        SERVICE_SEARCH_ITEMS,
+        SERVICE_LIST_LOCATION,
+        SERVICE_STORE_ITEM,
+        SERVICE_TAKE_ITEM,
+    ):
         hass.services.async_remove(DOMAIN, service)
