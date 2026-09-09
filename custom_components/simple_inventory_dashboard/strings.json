@@ -10,5 +10,11 @@
     "abort": {
       "already_configured": "The dashboard is already configured."
     }
+  },
+  "services": {
+    "search_items": { "name": "Search inventory items", "description": "Search by full or partial item name across inventories." },
+    "list_location": { "name": "List a location", "description": "List every item stored at an exact location." },
+    "store_item": { "name": "Store an item", "description": "Create an item or increase its existing quantity." },
+    "take_item": { "name": "Take an item", "description": "Find an unambiguous item and decrease its quantity." }
   }
 }

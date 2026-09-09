@@ -16,6 +16,34 @@ services. Data stays in Simple Inventory; this integration only provides the UI.
 - Recent inventory history
 - JSON export
 - French and English UI
+- Assist-friendly services for searching, listing a bin, storing and taking items
+
+## Voice assistant services
+
+The integration registers four response-enabled services. They discover
+inventories dynamically, so inventory IDs do not need to be hard-coded in YAML:
+
+- `simple_inventory_dashboard.search_items`: partial, case- and accent-insensitive
+  search across all inventories (or one optional inventory)
+- `simple_inventory_dashboard.list_location`: exact location/bin lookup
+- `simple_inventory_dashboard.store_item`: creates an item, or increments an
+  existing item with the same name
+- `simple_inventory_dashboard.take_item`: finds and decrements an item; if a
+  partial name matches several items, it returns the matches without changing stock
+
+Example script call:
+
+```yaml
+- action: simple_inventory_dashboard.search_items
+  data:
+    query: tournevis
+  response_variable: inventory_result
+```
+
+Expose these four services to the Home Assistant conversation agent to let it
+handle requests such as “où sont les tournevis ?”, “qu'y a-t-il dans le bac A1 ?”
+or “j'ai pris deux piles”. `inventory` accepts either the configured inventory
+name (for example `Armoire bureau`) or its ID.
 
 ## Install
 
@@ -36,7 +64,7 @@ Copy `custom_components/simple_inventory_dashboard` into Home Assistant's
 ## Compatibility
 
 - Home Assistant 2024.7 or newer
-- Simple Inventory 0.6.x
+- Simple Inventory 0.6.x or newer
 
 ## Releases
 

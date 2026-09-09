@@ -10,6 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, PANEL_ELEMENT, PANEL_ICON, PANEL_JS_URL, PANEL_TITLE, PANEL_URL
+from .services import async_register_services, async_unregister_services
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -30,13 +31,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config={
             "_panel_custom": {
                 "name": PANEL_ELEMENT,
-                "module_url": f"{PANEL_JS_URL}?v=0.1.1",
+                "module_url": f"{PANEL_JS_URL}?v=0.2.0",
                 "embed_iframe": False,
                 "trust_external": False,
             }
         },
         require_admin=False,
     )
+    async_register_services(hass)
     hass.data[DOMAIN] = True
     return True
 
@@ -45,4 +47,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Remove the sidebar panel."""
     if hass.data.pop(DOMAIN, None):
         frontend.async_remove_panel(hass, PANEL_URL)
+        async_unregister_services(hass)
     return True

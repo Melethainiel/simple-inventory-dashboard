@@ -10,5 +10,11 @@
     "abort": {
       "already_configured": "Le tableau de bord est déjà configuré."
     }
+  },
+  "services": {
+    "search_items": { "name": "Chercher un objet", "description": "Recherche un nom complet ou partiel dans les inventaires." },
+    "list_location": { "name": "Lister un emplacement", "description": "Liste tous les objets rangés dans un emplacement précis." },
+    "store_item": { "name": "Ranger un objet", "description": "Crée un objet ou augmente sa quantité s'il existe déjà." },
+    "take_item": { "name": "Sortir un objet", "description": "Trouve un objet sans ambiguïté et diminue sa quantité." }
   }
 }

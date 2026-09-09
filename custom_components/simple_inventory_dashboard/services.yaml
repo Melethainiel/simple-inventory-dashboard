@@ -1,0 +1,79 @@
+search_items:
+  name: Search inventory items
+  description: Search by full or partial name across every inventory, or one named inventory.
+  fields:
+    query:
+      name: Search
+      description: Full or partial item name.
+      required: true
+      example: screwdriver
+      selector: { text: {} }
+    inventory:
+      name: Inventory
+      description: Optional exact inventory name or ID. Leave empty to search everywhere.
+      selector: { text: {} }
+
+list_location:
+  name: List a location
+  description: Return all items stored at an exact location, across every inventory by default.
+  fields:
+    location:
+      name: Location
+      description: Exact location name, for example Bin A1.
+      required: true
+      example: Bin A1
+      selector: { text: {} }
+    inventory:
+      name: Inventory
+      description: Optional exact inventory name or ID.
+      selector: { text: {} }
+
+store_item:
+  name: Store an item
+  description: Create an item, or increase its quantity when that exact name already exists.
+  fields:
+    name:
+      name: Item name
+      description: Item name without the quantity.
+      required: true
+      selector: { text: {} }
+    inventory:
+      name: Inventory
+      description: Exact inventory name or ID.
+      required: true
+      selector: { text: {} }
+    location:
+      name: Location
+      description: Storage location, for example Bin A1.
+      required: true
+      selector: { text: {} }
+    quantity:
+      name: Quantity
+      description: Quantity to add. Defaults to 1.
+      default: 1
+      selector:
+        number: { min: 0.001, max: 999, step: any, mode: box }
+    category:
+      name: Category
+      description: Optional category.
+      selector: { text: {} }
+
+take_item:
+  name: Take an item
+  description: Find an item and decrease it. Nothing changes when the result is missing or ambiguous.
+  fields:
+    name:
+      name: Item name
+      description: Full or partial item name.
+      required: true
+      selector: { text: {} }
+    inventory:
+      name: Inventory
+      description: Optional exact inventory name or ID. Leave empty to resolve it automatically.
+      selector: { text: {} }
+    quantity:
+      name: Quantity
+      description: Quantity to take. Defaults to 1.
+      default: 1
+      selector:
+        number: { min: 0.001, max: 999, step: any, mode: box }
