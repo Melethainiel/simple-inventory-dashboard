@@ -1,0 +1,14 @@
+{
+  "title": "Tableau de bord Simple Inventory",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tableau de bord Simple Inventory",
+        "description": "Ajoute un panneau dédié à l’inventaire dans la barre latérale de Home Assistant. Simple Inventory doit déjà être installé et configuré."
+      }
+    },
+    "abort": {
+      "already_configured": "Le tableau de bord est déjà configuré."
+    }
+  }
+}

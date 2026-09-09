@@ -1,0 +1,14 @@
+{
+  "title": "Simple Inventory Dashboard",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Simple Inventory Dashboard",
+        "description": "Add a dedicated inventory panel to the Home Assistant sidebar. Simple Inventory must already be installed and configured."
+      }
+    },
+    "abort": {
+      "already_configured": "The dashboard is already configured."
+    }
+  }
+}
