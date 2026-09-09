@@ -36,7 +36,11 @@ class SimpleInventoryDashboard extends HTMLElement {
   async _start(){ this._discover(); this._render(); await this._load(); try { this._unsub=await this._hass.connection.subscribeMessage(()=>this._load(),{type:"simple_inventory/subscribe"}); } catch(_){} }
   disconnectedCallback(){ if(this._unsub) this._unsub(); }
   _discover(){
-    this._inventories=Object.values(this._hass.states).filter(s=>s.entity_id.startsWith("sensor.")&&s.attributes.inventory_id).map(s=>({id:s.attributes.inventory_id, entity:s.entity_id, name:String(s.attributes.friendly_name||s.entity_id).replace(/ Inventory$/i,"").replace(/ Inventaire$/i,""), icon:s.attributes.icon||"mdi:package-variant"}));
+    const inventories=new Map();
+    Object.values(this._hass.states)
+      .filter(s=>s.entity_id.startsWith("sensor.")&&s.attributes.inventory_id&&Object.hasOwn(s.attributes,"total_items")&&Object.hasOwn(s.attributes,"total_quantity"))
+      .forEach(s=>inventories.set(s.attributes.inventory_id,{id:s.attributes.inventory_id,entity:s.entity_id,name:String(s.attributes.friendly_name||s.entity_id).replace(/ Inventory$/i,"").replace(/ Inventaire$/i,""),icon:s.attributes.icon||"mdi:package-variant"}));
+    this._inventories=[...inventories.values()];
     if(this._selected!=="all"&&!this._inventories.some(x=>x.id===this._selected)) this._selected="all";
   }
   async _load(){
