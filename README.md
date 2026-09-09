@@ -18,10 +18,12 @@ services. Data stays in Simple Inventory; this integration only provides the UI.
 - French and English UI
 - Assist-friendly services for searching, listing a bin, storing and taking items
 
-## Voice assistant services
+## Voice assistant integration
 
-The integration registers four response-enabled services. They discover
-inventories dynamically, so inventory IDs do not need to be hard-coded in YAML:
+On Home Assistant 2026.8 or newer, the integration contributes four native tools
+directly to the **Assist** LLM API. No YAML scripts or manual entity exposure are
+required. Select **Assist** as the control mode in the conversation agent; it can
+then discover and call these tools automatically:
 
 - `simple_inventory_dashboard.search_items`: partial, case- and accent-insensitive
   search across all inventories (or one optional inventory)
@@ -31,7 +33,9 @@ inventories dynamically, so inventory IDs do not need to be hard-coded in YAML:
 - `simple_inventory_dashboard.take_item`: finds and decrements an item; if a
   partial name matches several items, it returns the matches without changing stock
 
-Example script call:
+The same operations remain available as response-enabled services for dashboards
+and automations. They discover inventories dynamically, so inventory IDs do not
+need to be hard-coded:
 
 ```yaml
 - action: simple_inventory_dashboard.search_items
@@ -40,10 +44,9 @@ Example script call:
   response_variable: inventory_result
 ```
 
-Expose these four services to the Home Assistant conversation agent to let it
-handle requests such as “où sont les tournevis ?”, “qu'y a-t-il dans le bac A1 ?”
-or “j'ai pris deux piles”. `inventory` accepts either the configured inventory
-name (for example `Armoire bureau`) or its ID.
+The conversation agent can handle requests such as “où sont les tournevis ?”,
+“qu'y a-t-il dans le bac A1 ?” or “j'ai pris deux piles”. `inventory` accepts
+either the configured inventory name (for example `Armoire bureau`) or its ID.
 
 ## Install
 
